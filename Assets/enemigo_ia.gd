@@ -69,8 +69,14 @@ func _physics_process(delta: float) -> void:
 ## la condición de perseguir también se cumple. Piensa cuál condición debe
 ## revisarse PRIMERO para que las demás no se la "roben".
 func _decidir_estado(distancia: float, lo_veo: bool) -> Estado:
-	# TODO: reemplazar esta línea por la lógica completa descrita arriba.
-	return Estado.PATRULLAR
+	if vida <= vida_huida and distancia <= rango_vision:
+		return Estado.HUIR
+	elif distancia <= rango_ataque and lo_veo:
+		return Estado.ATACAR
+	elif distancia <= rango_vision and lo_veo:
+		return Estado.PERSEGUIR
+	else:
+		return Estado.PATRULLAR
 
 
 ## Le hace daño al enemigo. Devuelve la vida restante.
