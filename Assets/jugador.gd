@@ -5,6 +5,10 @@ extends CharacterBody3D
 @export var camara: Camera3D
 ## Fuerza del salto.
 @export var salto_fuerza: float = 4.5
+## Aceleración del movimiento horizontal.
+@export var aceleracion: float = 20.0
+## Fricción al dejar de moverse.
+@export var friccion: float = 25.0
 
 func _ready() -> void:
 	if camara == null:
@@ -18,11 +22,14 @@ func _physics_process(delta: float) -> void:
 	var direction := camara.global_basis * entrada
 	direction.y = 0.0
 	direction = direction.normalized()
-	# TODO (Tarea 3): esto asigna la velocidad DE GOLPE. Reemplazar por
-	# move_toward con aceleración y fricción, como en la Sesión 9.
-	velocity.x = direction.x * speed
-	velocity.z = direction.z * speed
-
+	# --- Aceleración y fricción
+	if direction.length() > 0.01:
+		velocity.x = move_toward(velocity.x, direction.x * speed, aceleracion * delta)
+		velocity.z = move_toward(velocity.z, direction.z * speed, aceleracion * delta)
+	else:
+		velocity.x = move_toward(velocity.x, 0.0, friccion * delta)
+		velocity.z = move_toward(velocity.z, 0.0, friccion * delta)
+	# --- Gravedad y salto
 	velocity += get_gravity() * delta
  
 	if Input.is_action_just_pressed("saltar") and is_on_floor():
